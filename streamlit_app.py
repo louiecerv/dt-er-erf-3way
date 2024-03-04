@@ -5,9 +5,8 @@ import streamlit as st
 import altair as alt
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.naive_bayes import GaussianNB
-from sklearn.linear_model import LogisticRegression
-from sklearn import svm
+from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.datasets import make_blobs
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
@@ -16,42 +15,35 @@ from sklearn.metrics import classification_report
 # Define the Streamlit app
 def app():
 
-    st.title('Logistic Regression, Naive Bayes Classifiers and Support Vector Machine')
-    st.subheader('by Louie F. Cervantes M.Eng., WVSU College of ICT')
+    text = """Decision Tree, Random Forest and Extreme Random Forest on Random Data Clusters"""
+    st.subheader(text)
+    text = """Louie F. Cervantes, M. Eng. (Information Engineering) \n\n
+    CCS 229 - Intelligent Systems
+    Computer Science Department
+    College of Information and Communications Technology
+    West Visayas State University"""
+    st.text(text)
  
-    st.write('Logistic Regression:')
-    text = """Strengths: \nMore flexible: Can capture complex relationships between 
-    features and classes, even when they are non-linear. No strong independence assumption: 
-    Doesn't rely on the assumption that features are independent, which can be 
-    helpful for overlapping clusters."""
-    st.write(text)
-    text = """Weaknesses: \nOverfitting potential: Can overfit the training data when 
-    dealing with high dimensionality 
-    or small datasets."""
+    st.write('Decision Tree:')
+    text = """A very fast classfier but vulnerable to overfitting. May struggle with 
+    overlapping clusters due to rigid decision boundaries. Misclassification is 
+    likely at the cluster overlap regions.  Simple to interpret, efficient training."""
     st.write(text)
 
-    st.write('Naive Bayes')
-    text = """Strengths: \nEfficient: Works well with high-dimensional datasets 
-    due to its simplicity. 
-    Fast training: Requires less training time compared to logistic regression. 
-    Interpretable: Easy to understand the contribution of each feature to the prediction."""
+    st.write('Random Forest')
+    text = """Generally handles overlapping clusters better than decision trees due 
+    to averaging predictions from multiple trees. Can still have issues with 
+    highly overlapped clusters. Ensemble method, improves robustness and reduces 
+    overfitting compared to single decision trees."""
     st.write(text)
 
-    text = """Weaknesses:\nIndependence assumption: Relies on the strong 
-    assumption of feature independence, which can be violated in overlapping clusters, 
-    leading to inaccurate predictions."""
-    st.write(text)
-
-    st.write('Support Vector Machine')
-    st.write("""Strong in complex, high-dimensional spaces, 
-             but computationally expensive.""")
-
-    st.write("""Strengths: Handles high dimensions, maximizes separation, efficient memory use, 
-              and offers some non-linearity through kernels. Weaknesses: Computationally 
-              demanding, can be difficult to interpret, and requires careful parameter tuning. 
-              SVMs are powerful for complex problems, but their efficiency and 
-              interpretability need consideration.""")
-
+    st.write('Extreme Random Forest')
+    st.write("""Often shows better performance on overlapping clusters than both 
+    decision trees and random forests. This is due to additional randomization in 
+    feature selection and splitting criteria. Builds on random forests by 
+    introducing additional randomness in feature selection and splitting criteria, 
+    potentially improving performance on complex data.""")
+ 
     # Create a slider with a label and initial value
     n_samples = st.slider(
         label="Number of samples (200 to 4000):",
@@ -61,7 +53,13 @@ def app():
         value=1000,  # Initial value
     )
 
-    cluster_std = st.number_input("Standard deviation (between 0 and 1):")
+    cluster_std = st.slider(
+        label="Standard deviation (between 0 and 1):",
+        min_value=0.0,
+        max_value=1.0,
+        step=0.1,
+        value=0.5  # Initial value
+    )
 
     random_state = st.slider(
         label="Random seed (between 0 and 100):",
@@ -88,23 +86,19 @@ def app():
         X_train, X_test, y_train, y_test = train_test_split(X, y, \
             test_size=0.2, random_state=42)
         
-        st.subheader('Logistic Regression')
-        clf = LogisticRegression(C=1.0, class_weight=None, 
-            dual=False, fit_intercept=True,
-            intercept_scaling=1, max_iter=100, multi_class='auto',
-            n_jobs=1, penalty='l2', random_state=42, solver='lbfgs',
-            tol=0.0001, verbose=0, warm_start=False)
+        st.subheader('Decision Tree')
+        clf = tree.DecisionTreeClassifier()
         
         y_test_pred = classify(clf, X_train, X_test, y_train, y_test)
         visualize_classifier(clf, X_test, y_test_pred)
 
-        st.subheader('Naive Bayes')
-        clf = GaussianNB()
+        st.subheader('Random Forest')
+        clf = RandomForestClassifier(n_jobs=2, random_state=0)
         y_test_pred = classify(clf, X_train, X_test, y_train, y_test)
         visualize_classifier(clf, X_test, y_test_pred)
 
-        st.subheader('Support Vector Machine')
-        clf = svm.SVC(kernel='linear', C=1000)
+        st.subheader('Extreme Random Forest')
+        clf = ExtraTreesClassifier(n_estimators=100, max_depth=4, random_state=0)
         y_test_pred = classify(clf, X_train, X_test, y_train, y_test)
         visualize_classifier(clf, X_test, y_test_pred)
 
