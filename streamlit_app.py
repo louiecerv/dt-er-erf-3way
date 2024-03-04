@@ -24,20 +24,20 @@ def app():
     West Visayas State University"""
     st.text(text)
  
-    st.write('Decision Tree:')
+    st.subheader('Decision Tree')
     text = """A very fast classfier but vulnerable to overfitting. May struggle with 
     overlapping clusters due to rigid decision boundaries. Misclassification is 
     likely at the cluster overlap regions.  Simple to interpret, efficient training."""
     st.write(text)
 
-    st.write('Random Forest')
+    st.subheader('Random Forest')
     text = """Generally handles overlapping clusters better than decision trees due 
     to averaging predictions from multiple trees. Can still have issues with 
     highly overlapped clusters. Ensemble method, improves robustness and reduces 
     overfitting compared to single decision trees."""
     st.write(text)
 
-    st.write('Extreme Random Forest')
+    st.subheader('Extreme Random Forest')
     st.write("""Often shows better performance on overlapping clusters than both 
     decision trees and random forests. This is due to additional randomization in 
     feature selection and splitting criteria. Builds on random forests by 
